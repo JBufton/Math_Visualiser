@@ -1,14 +1,18 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <complex>
+#include <mutex>
+#include <vector>
 
 SDL_Window *Window = NULL;
 SDL_Renderer *Renderer = NULL;
 SDL_Surface *Surface = NULL;
-const int ImageWidth = 3840;
-const int ImageHeight = 2160;
-const int WindowWidth = 3840;
-const int WindowHeight = 2160;
+const int ImageWidth = 1920;
+const int ImageHeight = 1080;
+const int WindowWidth = 1920;
+const int WindowHeight = 1080;
+const int MaxThreads = 2;
+std::mutex Lock;
 
 
 void ErrorPrint( const char* _Message )
@@ -62,11 +66,12 @@ int QuitSDL()
 }
 
 
-void GenerateImage()
+void GeneratePart( int yFrom, int yTo, int xFrom, int xTo)
 {
-	for( size_t y = 0; y < ImageHeight; ++y )
+	std::vector<int> Colours;
+	for( size_t y = yFrom; y < yTo; ++y )
 	{
-		for( size_t x = 0; x < ImageWidth; ++x )
+		for( size_t x = xFrom; x < xTo; ++x )
 		{
 
 			std::complex<double> c(1.0 * x/ImageHeight * 4.0 - 2.0, 1.0 * y / ImageHeight * 4.0 - 2.0);	
@@ -81,11 +86,39 @@ void GenerateImage()
 				++count;
 			}
 
-			SDL_SetRenderDrawColor( Renderer, count, count, count, 0xff);
-			SDL_RenderDrawPoint( Renderer, x, y);
+
+			for(int i = 0; i < 3; ++i)
+			{
+				Colours.push_back(count)
+			}
+			Colours.push_back(255)
 
 		}	
 	}
+
+	size_t ColoursSize = (yTo-yFrom)*(xTo-xFrom)*4
+	// Render
+	Lock.lock()
+	int xPos = xFrom;
+	int yPos = yFrom;
+	for(size_t i = 0; i < ColoursSize; i += 4)
+	{
+		SDL_SetRenderDrawColor( Renderer, Colours[i], Colours[i+1], Colours[i+2], Colours[i+3] );
+		xPos += 1;
+		if(xPos == xTo)
+		{
+			xPos = xFrom;
+			yPos += 1;
+		}
+		SDL_RenderDrawPoint( Renderer, xPos, yPos);
+	}
+	Lock.unlock()
+}
+
+
+void GenerateImage()
+{
+
 
 	SDL_RenderPresent( Renderer );
 }
