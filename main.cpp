@@ -3,16 +3,19 @@
 #include <complex>
 #include <mutex>
 #include <vector>
-#include "include/TaskScheduler.h"
+#include <thread>
+#include <math.h>
 
 SDL_Window *Window = NULL;
 SDL_Renderer *Renderer = NULL;
 SDL_Surface *Surface = NULL;
+SDL_Surface *HighResSurface = NULL;
 const int ImageWidth = 1920;
 const int ImageHeight = 1080;
 const int WindowWidth = 1920;
 const int WindowHeight = 1080;
-const int MaxThreads = 2;
+const int MaxThreads = std::thread::hardware_concurrency();
+std::vector<std::thread*> Threads;
 std::mutex Lock;
 
 
@@ -21,7 +24,13 @@ void ErrorPrint( const char* _Message )
 	std::cout << "[ERROR]: " << _Message << std::endl;
 }
 
-
+void CreateThreads()
+{
+	for( size_t i = 0; i < MaxThreads; ++i )
+	{
+		Threads.push_back( new std::thread );
+	}
+}
 
 int SetupSDL()
 {
@@ -47,6 +56,9 @@ int SetupSDL()
 		ErrorPrint( "Failed to get the windows surface" );
 		return 1;
 	}
+
+
+	HighResSurface = SDL_CreateRGBSurface(NULL, ImageWidth, ImageHeight,NULL,NULL,NULL,NULL,NULL);
 
 
 	SDL_SetWindowPosition( Window, 0, 0);
@@ -90,16 +102,16 @@ void GeneratePart( int yFrom, int yTo, int xFrom, int xTo)
 
 			for(int i = 0; i < 3; ++i)
 			{
-				Colours.push_back(count)
+				Colours.push_back(count);
 			}
-			Colours.push_back(255)
+			Colours.push_back(255);
 
 		}	
 	}
 
-	size_t ColoursSize = (yTo-yFrom)*(xTo-xFrom)*4
+	size_t ColoursSize = (yTo-yFrom)*(xTo-xFrom)*4;
 	// Render
-	Lock.lock()
+	Lock.lock();
 	int xPos = xFrom;
 	int yPos = yFrom;
 	for(size_t i = 0; i < ColoursSize; i += 4)
@@ -119,6 +131,26 @@ void GeneratePart( int yFrom, int yTo, int xFrom, int xTo)
 
 void GenerateImage()
 {
+	int PatchWidth = ceil(ImageWidth/(MaxThreads/2));
+	int PatchHeight = ceil(ImageHeight/(MaxThreads/2));
+	size_t PatchStartX = 0;
+	size_t PatchStartY = 0;
+
+	for(auto i : Threads)
+	{
+		i = std::thread( &GeneratePart, PatchStartY, PatchStartY + PatchHeight, PatchStartX, PatchStartX + PatchWidth );
+		PatchStartX += PatchWidth;
+		if( PatchStartX > ImageWidth)
+		{
+			PatchStartX = 0;
+			PatchStartY += PatchHeight;
+			if( PatchStartY > ImageHeight )
+			{
+				break;
+			}
+		}
+	}
+
 
 
 	SDL_RenderPresent( Renderer );
