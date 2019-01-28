@@ -5,10 +5,10 @@
 SDL_Window *Window = NULL;
 SDL_Renderer *Renderer = NULL;
 SDL_Surface *Surface = NULL;
-int ImageWidth = 1000;
-int ImageHeight = 1000;
-int WindowWidth = 1920;
-int WindowHeight = 1080;
+const int ImageWidth = 1000;
+const int ImageHeight = 1000;
+const int WindowWidth = 1920;
+const int WindowHeight = 1080;
 
 
 void ErrorPrint( const char* _Message )
@@ -93,8 +93,13 @@ void GenerateImage()
 
 int SaveImage()
 {
+	const Uint32 format = SDL_PIXELFORMAT_ARGB8888;
 
-	SDL_SaveBMP( Surface, "~/Documents/Image.bmp" );
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, ImageWidth, ImageHeight, 32, format);
+    SDL_RenderReadPixels(Renderer, NULL, format, surface->pixels, surface->pitch);
+    SDL_SaveBMP(surface, "screenshot.bmp");
+    SDL_FreeSurface(surface);
+
 	return 0;
 }
 
