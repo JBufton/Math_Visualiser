@@ -3,6 +3,7 @@
 #include <complex>
 #include <mutex>
 #include <vector>
+#include "include/TaskScheduler.h"
 
 SDL_Window *Window = NULL;
 SDL_Renderer *Renderer = NULL;
@@ -112,7 +113,7 @@ void GeneratePart( int yFrom, int yTo, int xFrom, int xTo)
 		}
 		SDL_RenderDrawPoint( Renderer, xPos, yPos);
 	}
-	Lock.unlock()
+	Lock.unlock();
 }
 
 
