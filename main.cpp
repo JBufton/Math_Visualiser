@@ -5,10 +5,10 @@
 SDL_Window *Window = NULL;
 SDL_Renderer *Renderer = NULL;
 SDL_Surface *Surface = NULL;
-const int ImageWidth = 1000;
-const int ImageHeight = 1000;
-const int WindowWidth = 1920;
-const int WindowHeight = 1080;
+const int ImageWidth = 3840;
+const int ImageHeight = 2160;
+const int WindowWidth = 3840;
+const int WindowHeight = 2160;
 
 
 void ErrorPrint( const char* _Message )
@@ -64,12 +64,12 @@ int QuitSDL()
 
 void GenerateImage()
 {
-	for( size_t y = 0; y < WindowHeight; ++y )
+	for( size_t y = 0; y < ImageHeight; ++y )
 	{
-		for( size_t x = 0; x < WindowWidth; ++x )
+		for( size_t x = 0; x < ImageWidth; ++x )
 		{
 
-			std::complex<double> c(1.0 * x/WindowHeight * 4.0 - 2.0, 1.0 * y / WindowHeight * 4.0 - 2.0);	
+			std::complex<double> c(1.0 * x/ImageHeight * 4.0 - 2.0, 1.0 * y / ImageHeight * 4.0 - 2.0);	
 			std::complex<double> z(0.0, 0.0);
 
 			int count = 0;
@@ -117,7 +117,7 @@ int main()
 	GenerateImage();	
 	SaveImage();
 
-	SDL_Delay(10000);
+	//SDL_Delay(10000);
 
 	QuitSDL();
 
