@@ -116,4 +116,6 @@ int main()
 
 	QuitSDL();
 
+	return 0;
+
 }
