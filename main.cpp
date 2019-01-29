@@ -41,9 +41,9 @@ int SetupSDL()
 		return 1;
 	}
 
-	SDL_CreateWindowAndRenderer( WindowWidth, WindowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &Window, &Renderer);
+	Window = SDL_CreateWindow( "Math Visualiser", 0, 0, WindowWidth, WindowHeight, SDL_WINDOW_RESIZABLE );
 
-	if ( Window == NULL || Renderer == NULL )
+	if ( Window == NULL )
 	{
 		ErrorPrint( "Failed to create an SDL window or renderer" );
 		return 1;
@@ -57,11 +57,7 @@ int SetupSDL()
 		return 1;
 	}
 
-
-	HighResSurface = SDL_CreateRGBSurface(NULL, ImageWidth, ImageHeight,NULL,NULL,NULL,NULL,NULL);
-
-
-	SDL_SetWindowPosition( Window, 0, 0);
+	HighResSurface = SDL_CreateRGBSurfaceWithFormat(NULL, ImageWidth, ImageHeight, 32, SDL_PIXELFORMAT_ARGB8888);
 
 	return 0;
 }
@@ -76,6 +72,20 @@ int QuitSDL()
 
 	SDL_Quit();
 
+}
+
+
+void WritePixelRGBA( int _x, int _y, Uint32 _Pixel, SDL_Surface *_Surface )
+{
+	void* Pixels = _Surface->pixels();
+	Pixels[_x + (_y*ImageWidth)] = Pixel;
+}
+
+void WritePixelsRGBA( SDL_Surface *_Surface, std::vector<Uint8> _Pixels )
+{
+	void* Pixels = _Surface->pixels();
+	Uint32 *PixelsToWrite = &_Pixels[0];
+	Pixels = _PixelsToWrite;
 }
 
 
