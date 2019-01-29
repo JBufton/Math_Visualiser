@@ -138,7 +138,7 @@ void GenerateImage()
 
 	for(auto i : Threads)
 	{
-		i = std::thread( &GeneratePart, PatchStartY, PatchStartY + PatchHeight, PatchStartX, PatchStartX + PatchWidth );
+		i = new std::thread( &GeneratePart, PatchStartY, PatchStartY + PatchHeight, PatchStartX, PatchStartX + PatchWidth );
 		PatchStartX += PatchWidth;
 		if( PatchStartX > ImageWidth)
 		{
